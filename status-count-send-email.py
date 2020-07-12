@@ -1,7 +1,7 @@
 import os
 import mysql.connector
 def sendMail():
-    mydb = mysql.connector.connect(host='localhost', user='root', passwd='R00t@123', db='transfer')
+    mydb = mysql.connector.connect(host='localhost', user='xxxx', passwd='xxxxxxx', db='transfer')
     cursor = mydb.cursor()
     cursor.execute('select count(1) from status_volume2 where status = 0;')
     File_yet_to_copy_volume2 = cursor.fetchone()[0]
@@ -12,9 +12,9 @@ def sendMail():
     File_copied_volume2 =cursor.fetchone()[0]
     sendmail_location = "/usr/sbin/sendmail" # sendmail location
     p = os.popen("%s -t" % sendmail_location, "w")
-    p.write("From: %s\n" % "itsupport.alerts@vuclip.com")
-    p.write("To: %s\n" % "it.india@vuclip.com,pushkar.joshi@vuclip.com,suyog.shirgaonkar@vuclip.com,nirav.shah@vuclip.com")
-    p.write("Subject: Mumbai Backup : File Upload Status\n")
+    p.write("From: %s\n" % "myemail@domain.com")
+    p.write("To: %s\n" % "myemail@domain.com")
+    p.write("Subject:  Backup : File Upload Status\n")
     p.write("\n") # blank line separating headers from body
     p.write("/volume2 Partation Details:  :")
     p.write("\n") # blank line separating headers from body
