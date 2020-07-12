@@ -10,13 +10,13 @@ import mysql.connector
 from os.path import join, getsize
 from google.cloud import storage
 
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/home/pushkar/mumbai-service-account.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"] = "/home/pushkar/service-account.json"
 BatchSize = 30 
 e = concurrent.futures.ThreadPoolExecutor(max_workers=BatchSize)
 
 
 def file_list(folder_name):
-    mydb = mysql.connector.connect(host='localhost', user='root', passwd='R00t@123', db='transfer')
+    mydb = mysql.connector.connect(host='localhost', user='xxxxx', passwd='xxxxx', db='transfer')
     cursor = mydb.cursor()
     cursor.execute("""INSERT INTO last_updated_volume2 (last_run) VALUES (now())""")
     f = open("/home/pushkar/python-code/upload-volume2/db-filelist.csv", "a+")
@@ -56,7 +56,7 @@ def file_list(folder_name):
 
 def set_blob():
     """set file to 0"""
-    mydb = mysql.connector.connect(host='localhost', user='root', passwd='R00t@123', db='transfer')
+    mydb = mysql.connector.connect(host='localhost', user='xxxx', passwd='xxxxxxx', db='transfer')
     cursor = mydb.cursor()
     cursor.execute('update status_volume2 set status = 0 where status = 1')
     mydb.commit()
@@ -65,7 +65,7 @@ def set_blob():
 
 def upload_blob():
     """Uploads a file to the bucket."""
-    mydb = mysql.connector.connect(host='localhost', user='root', passwd='R00t@123', db='transfer')
+    mydb = mysql.connector.connect(host='localhost', user='xxxxxx', passwd='xxxxx', db='transfer')
     futureRes = []
     start =1
     while start == 1:
@@ -106,19 +106,19 @@ def upload_blob():
             break;
 
 def get_file_to_upload():
-    mydb = mysql.connector.connect(host='localhost', user='root', passwd='R00t@123', db='transfer')
+    mydb = mysql.connector.connect(host='localhost', user='xxxxx', passwd='xxxxx', db='transfer')
     cursor = mydb.cursor()
     cursor.execute('SELECT file from status_volume2 where status = 0 limit 100')
     return cursor.fetchall()
 
 def upload_to_storage(source_file_name, ct):
-    mydb = mysql.connector.connect(host='localhost', user='root', passwd='R00t@123', db='transfer')
+    mydb = mysql.connector.connect(host='localhost', user='xxxxx', passwd='xxxxx', db='transfer')
     cursor = mydb.cursor()
     cursor.execute('UPDATE status_volume2 SET status = 1 WHERE file = "' + source_file_name + '"')
     mydb.commit()
     cursor.close()
-    bucket_name = "vuclip-originals-broadcast"
-    dest_dir = "Mumbai/TANDERBERG/Content-Share_2/"
+    bucket_name = "gcs-bucket-name"
+    dest_dir = "dest/folder/name/"
     dest_file_name_temp = source_file_name
     upload_file_name = (dest_file_name_temp.split("/volume2/",1)[1])
     print (upload_file_name)
@@ -133,14 +133,14 @@ def upload_to_storage(source_file_name, ct):
     print("ct value is", ct)
 
 def update_db(filename):
-    mydb = mysql.connector.connect(host='localhost', user='root', passwd='R00t@123', db='transfer')
+    mydb = mysql.connector.connect(host='localhost', user='xxxxx', passwd='xxxxx', db='transfer')
     cursor = mydb.cursor()
     cursor.execute('UPDATE status_volume2 SET status = 2 WHERE file = "' + filename + '"')
     mydb.commit()
     cursor.close()
 
 def check_script_Status():
-    mydb = mysql.connector.connect(host='localhost', user='root', passwd='R00t@123', db='transfer')
+    mydb = mysql.connector.connect(host='localhost', user='xxxxx', passwd='xxxxx', db='transfer')
     cursor = mydb.cursor()
     cursor.execute('select copy_finished from last_updated_volume2 order by last_run DESC LIMIT 1;')
     copy_completed = cursor.fetchone()[0]
@@ -150,9 +150,9 @@ def check_script_Status():
         print("-----Last copy script was not completed. Starting Again..-----")
         sendmail_location = "/usr/sbin/sendmail" # sendmail location
         p = os.popen("%s -t" % sendmail_location, "w")
-        p.write("From: %s\n" % "itsupport.alerts@vuclip.com")
-        p.write("To: %s\n" % "it.india@vuclip.com,pushkar.joshi@vuclip.com")
-        p.write("Subject: Mumbai Backup : Upload volume2 script started...\n")
+        p.write("From: %s\n" % "from@dom.com")
+        p.write("To: %s\n" % "to@domain.com")
+        p.write("Subject:  Backup : Upload volume2 script started...\n")
         p.write("\n") # blank line separating headers from body
         p.write("Last copy script was not completed. Starting Again..\n")
         set_blob()
@@ -160,9 +160,9 @@ def check_script_Status():
     else:
         print("-----Last copy script was completed. Starting with new file list..-----")
         p = os.popen("%s -t" % sendmail_location, "w")
-        p.write("From: %s\n" % "itsupport.alerts@vuclip.com")
-        p.write("To: %s\n" % "it.india@vuclip.com,pushkar.joshi@vuclip.com")
-        p.write("Subject: Mumbai Backup : Upload volume2 script started...\n")
+        p.write("From: %s\n" % "from@dom.com")
+        p.write("To: %s\n" % "to@domain.com")
+        p.write("Subject:  Backup : Upload volume2 script started...\n")
         p.write("\n") # blank line separating headers from body
         p.write("Last copy script was completed. Starting with new file list..\n")
         file_list("/volume2/")
@@ -170,16 +170,16 @@ def check_script_Status():
         upload_blob()
 
 def update_Script_completed():
-    mydb = mysql.connector.connect(host='localhost', user='root', passwd='R00t@123', db='transfer')
+    mydb = mysql.connector.connect(host='localhost', user='xxxxx', passwd='xxxxx', db='transfer')
     cursor = mydb.cursor()
     cursor.execute('update last_updated_volume2 set copy_finished = 1 ORDER BY last_run DESC LIMIT 1')
     mydb.commit()
     cursor.close()
     sendmail_location = "/usr/sbin/sendmail" # sendmail location
     p = os.popen("%s -t" % sendmail_location, "w")
-    p.write("From: %s\n" % "itsupport.alerts@vuclip.com")
-    p.write("To: %s\n" % "it.india@vuclip.com,pushkar.joshi@vuclip.com,suyog.shirgaonkar@vuclip.com,nirav.shah@vuclip.com")
-    p.write("Subject: Mumbai Backup : Upload volume2 script completed...\n")
+        p.write("From: %s\n" % "from@dom.com")
+        p.write("To: %s\n" % "to@domain.com")
+    p.write("Subject:  Backup : Upload volume2 script completed...\n")
     p.write("\n") # blank line separating headers from body
     status = p.close()
     print("---The script is completed at time and last_updated table is marked as 1---")
