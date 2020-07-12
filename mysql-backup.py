@@ -16,14 +16,14 @@ import time
 import datetime
 import pipes
 from google.cloud import storage
-os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="/home/pushkar/mumbai-service-account.json"
+os.environ["GOOGLE_APPLICATION_CREDENTIALS"]="/home/pushkar/service-account.json"
 
 
 # MySQL database details to which backup to be done. Make sure below user having enough privileges to take databases backup.
 # To take multiple databases backup, create any file like /backup/dbnames.txt and put databases names one on each line and assigned to DB_NAME variable.
 DB_HOST = 'localhost'
-DB_USER = 'root'
-DB_USER_PASSWORD = 'R00t@123'
+DB_USER = 'xxxx'
+DB_USER_PASSWORD = 'xxxxx'
 #DB_NAME = '/backup/dbnameslist.txt'
 DB_NAME = 'transfer'
 BACKUP_PATH = '/opt/mysql-backup'
@@ -80,7 +80,7 @@ print ("Backup script completed, starting upload to gcp bucket")
 print ("Your backups have been created in '" + TODAYBACKUPPATH + "' directory and the full file name is '" + backupfilename +"'")
 
 def upload_to_storage(backupfilename):
-    bucket_name = "vuclip-originals-broadcast"
+    bucket_name = "gcs-bucket-name"
     dest_dir = "mysql-backup"
     dest_file_name_temp = backupfilename
     upload_file_name = (dest_file_name_temp.split("/opt/mysql-backup")[1])
